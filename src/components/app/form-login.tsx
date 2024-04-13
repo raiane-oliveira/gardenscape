@@ -43,18 +43,13 @@ export function FormLogin() {
       setCookie(accessTokenCookieName, data.access_token)
 
       router.push("/app")
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        return toast({
-          title: "oops! Something went wrong",
-          description: err.response?.data.message ?? err.message,
-          variant: "destructive",
-        })
-      }
+    } catch (err: any) {
+      const errorMessage =
+        err instanceof AxiosError ? err.response?.data.message : err.message
 
-      const error = err as Error
-      toast({
-        description: error.message,
+      return toast({
+        title: "Oops! Something went wrong",
+        description: errorMessage,
         variant: "destructive",
       })
     }
