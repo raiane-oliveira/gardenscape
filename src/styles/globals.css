@@ -1,4 +1,18 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .half-container {
+    max-width: calc(100vw - (100vw - var(--screen-width, 1400px)) / 2);
+    padding: 0 2rem;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5 rounded-xl bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-neutral-200;
+  }
+}
