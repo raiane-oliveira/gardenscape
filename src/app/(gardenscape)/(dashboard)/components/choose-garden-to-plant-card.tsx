@@ -28,7 +28,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { Garden } from "@/core/types/api-interfaces"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface CreateGardenFormProps extends ChildrenProps {}
 

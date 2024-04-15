@@ -10,7 +10,25 @@ import { PageProps } from "../../../../../../.next/types/app/layout"
 import { getToken } from "@/utils/get-token"
 import { cookies } from "next/headers"
 import Link from "next/link"
-import { Gear } from "@phosphor-icons/react/dist/ssr"
+import Image from "next/image"
+import { DotsThreeVertical, Gear } from "@phosphor-icons/react/dist/ssr"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { CreateGardenCardForm } from "@/components/app/create-garden-card-form"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
+import { Badge } from "@/components/ui/badge"
+import dayjs from "dayjs"
 
 interface MePageProps extends PageProps {
   params: {
@@ -25,7 +43,14 @@ export default async function MePage({ params }: MePageProps) {
   const response = await get(`/gardeners/${username}`)
   const data: { gardener: GardenerDetails } = await response.json()
 
+  if (!data) {
+    return <h1 className="animate-pulse text-4xl">Loading...</h1>
+  }
+
   const { gardener } = data
+  const isOwner = decodedToken && username === decodedToken.username
+
+  const memberSince = dayjs(gardener.createdAt).format("[member since ]LL")
 
   return (
     <div>
@@ -42,13 +67,11 @@ export default async function MePage({ params }: MePageProps) {
               <span className="text-lg text-neutral-500">
                 {gardener.username}
               </span>
-              <span className="text-lg text-neutral-500">
-                {gardener.createdAt.toLocaleString()}
-              </span>
+              <span className="text-lg text-neutral-500">{memberSince}</span>
             </div>
           </div>
 
-          {decodedToken && username === decodedToken.username && (
+          {isOwner && (
             <Link
               href="/settings/account"
               className="group ml-auto text-neutral-500 hover:text-neutral-900"
@@ -94,6 +117,127 @@ export default async function MePage({ params }: MePageProps) {
           </CardContent>
         </Card>
       </aside>
+
+      <main className="py-8">
+        <section className="grid gap-6">
+          <header className="container flex items-center justify-between gap-4">
+            <h2 className="text-3xl font-semibold text-zinc-700">
+              Your gardens
+            </h2>
+
+            {isOwner && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add garden</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg">
+                  <CreateGardenCardForm />
+                </DialogContent>
+              </Dialog>
+            )}
+          </header>
+
+          <Carousel opts={{ dragFree: true }}>
+            <CarouselContent className="half-container relative ml-auto px-6">
+              {gardener.gardens.length === 0 && (
+                <div>
+                  <p>
+                    {isOwner
+                      ? "It seems you don't have any garden yet."
+                      : `It seems ${username} does not have any garden yet.`}
+                  </p>
+
+                  {isOwner && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>Click here to add </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="sm:max-w-lg">
+                        <CreateGardenCardForm />
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
+              )}
+
+              {gardener.gardens.map((garden) => {
+                if (!isOwner && garden.visibility === "private") {
+                  return null
+                }
+
+                const updatedAt = dayjs(garden.updatedAt).format("LL")
+                const createdAt = dayjs(garden.createdAt).format("LL")
+
+                return (
+                  <CarouselItem key={garden.id} className="relative max-w-xs">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className="absolute right-2 top-2 z-10"
+                          size="icon"
+                          variant="ghost"
+                        >
+                          <DotsThreeVertical className="h-6 w-6" />
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <GardenSettingsDropdownContent garden={garden} />
+                    </DropdownMenu>
+
+                    <Link
+                      href={`/garden/${garden.slug}`}
+                      className="block h-full w-full"
+                    >
+                      <div className="relative space-y-3">
+                        <div className="h-56 w-full overflow-hidden rounded-lg">
+                          <Image
+                            src={""}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            width={300}
+                            height={300}
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <strong className="text-lg font-medium">
+                              {garden.name}
+                            </strong>
+
+                            {isOwner && (
+                              <Badge
+                                variant={
+                                  garden.visibility === "private"
+                                    ? "secondary"
+                                    : "default"
+                                }
+                                className="ml-auto uppercase"
+                              >
+                                {garden.visibility}
+                              </Badge>
+                            )}
+                          </div>
+
+                          <span className="text-zinc-500">
+                            {garden.updatedAt
+                              ? `Updated at ${updatedAt}`
+                              : `Created at ${createdAt}`}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </CarouselItem>
+                )
+              })}
+            </CarouselContent>
+
+            <CarouselPrevious className="left-6 disabled:hidden" />
+            <CarouselNext className="right-6 z-20" />
+          </Carousel>
+        </section>
+      </main>
     </div>
   )
 }
