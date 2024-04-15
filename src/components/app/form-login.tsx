@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { setCookie } from "cookies-next"
 import { accessTokenCookieName } from "@/data/static-info"
 import { Loader } from "../atoms/loader"
+import { jwtDecode } from "jwt-decode"
 
 const loginFormSchema = z.object({
   username: z.string(),
@@ -40,7 +41,14 @@ export function FormLogin() {
         values,
       )
 
-      setCookie(accessTokenCookieName, data.access_token)
+      const decodedToken = jwtDecode(data.access_token)
+      const unixTimestampMilliseconds = new Date(
+        (decodedToken.exp as number) * 1000,
+      )
+
+      setCookie(accessTokenCookieName, data.access_token, {
+        expires: unixTimestampMilliseconds,
+      })
 
       router.push("/app")
     } catch (err: any) {
