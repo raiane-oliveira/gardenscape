@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { EditGardenDialogContent } from "./edit-garden-dialog-content"
 import { getToken } from "@/utils/get-token"
 import { Garden } from "@/core/types/api-interfaces"
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
 
 interface GardenSettingsDropdownContentProps {
   garden: Garden
@@ -63,15 +64,17 @@ export function GardenSettingsDropdownContent({
         />
       </Dialog>
 
-      <Button
-        disabled={isLoading}
-        variant="destructive"
-        size="sm"
-        className="w-full rounded"
-        onClick={handleDeleteGarden}
-      >
-        Delete garden
-      </Button>
+      <DropdownMenuItem>
+        <Button
+          disabled={isLoading}
+          variant="destructive"
+          size="sm"
+          className="w-full rounded"
+          onClick={handleDeleteGarden}
+        >
+          Delete garden
+        </Button>
+      </DropdownMenuItem>
     </DropdownMenuContent>
   )
 }

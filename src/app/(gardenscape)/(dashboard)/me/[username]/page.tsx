@@ -1,17 +1,12 @@
+import { CreateGardenCardForm } from "@/components/app/create-garden-card-form"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
 } from "@/components/ui/card"
-import { GardenerDetails } from "@/core/types/api-interfaces"
-import { get } from "@/utils/get-api"
-import { PageProps } from "../../../../../../.next/types/app/layout"
-import { getToken } from "@/utils/get-token"
-import { cookies } from "next/headers"
-import Link from "next/link"
-import Image from "next/image"
-import { DotsThreeVertical, Gear } from "@phosphor-icons/react/dist/ssr"
 import {
   Carousel,
   CarouselContent,
@@ -20,15 +15,21 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { CreateGardenCardForm } from "@/components/app/create-garden-card-form"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
-import { Badge } from "@/components/ui/badge"
+import { GardenerDetails } from "@/core/types/api-interfaces"
+import { get } from "@/utils/get-api"
+import { getToken } from "@/utils/get-token"
+import { DotsThreeVertical, Gear } from "@phosphor-icons/react/dist/ssr"
 import dayjs from "dayjs"
+import { cookies } from "next/headers"
+import Image from "next/image"
+import Link from "next/link"
+import { PageProps } from "../../../../../../.next/types/app/layout"
+import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
+import { AddNewGardenButton } from "./add-new-garden-button"
 
 interface MePageProps extends PageProps {
   params: {
@@ -40,6 +41,7 @@ export default async function MePage({ params }: MePageProps) {
   const username = params.username
   const { decodedToken } = getToken("server", cookies())
 
+  // FIX: change to use client fetch to solve react query cache error
   const response = await get(`/gardeners/${username}`)
   const data: { gardener: GardenerDetails } = await response.json()
 
@@ -50,7 +52,7 @@ export default async function MePage({ params }: MePageProps) {
   const { gardener } = data
   const isOwner = decodedToken && username === decodedToken.username
 
-  const memberSince = dayjs(gardener.createdAt).format("[member since ]LL")
+  const memberSince = dayjs(gardener.createdAt).format("[Member since ]LL")
 
   return (
     <div>
@@ -125,16 +127,7 @@ export default async function MePage({ params }: MePageProps) {
               Your gardens
             </h2>
 
-            {isOwner && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Add garden</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <CreateGardenCardForm />
-                </DialogContent>
-              </Dialog>
-            )}
+            {isOwner && <AddNewGardenButton />}
           </header>
 
           <Carousel opts={{ dragFree: true }}>
@@ -171,19 +164,21 @@ export default async function MePage({ params }: MePageProps) {
 
                 return (
                   <CarouselItem key={garden.id} className="relative max-w-xs">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          className="absolute right-2 top-2 z-10"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <DotsThreeVertical className="h-6 w-6" />
-                        </Button>
-                      </DropdownMenuTrigger>
+                    {isOwner && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            className="absolute right-2 top-2 z-10"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <DotsThreeVertical className="h-6 w-6" />
+                          </Button>
+                        </DropdownMenuTrigger>
 
-                      <GardenSettingsDropdownContent garden={garden} />
-                    </DropdownMenu>
+                        <GardenSettingsDropdownContent garden={garden} />
+                      </DropdownMenu>
+                    )}
 
                     <Link
                       href={`/garden/${garden.slug}`}
