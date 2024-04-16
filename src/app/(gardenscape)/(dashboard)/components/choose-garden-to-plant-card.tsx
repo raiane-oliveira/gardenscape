@@ -12,7 +12,7 @@ import { CreateGardenCardForm } from "@/components/app/create-garden-card-form"
 import { useState } from "react"
 import { ChildrenProps } from "@/core/types/children-props"
 import { toast } from "@/components/ui/use-toast"
-import { useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { AxiosError } from "axios"
 import { axios } from "@/lib/axios"
 import { getCookie } from "cookies-next"
@@ -59,6 +59,7 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
     name: "gardens",
   })
 
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -104,7 +105,7 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
 
       await Promise.all(plantOnGardens)
 
-      router.replace("/app")
+      router.replace(pathname)
       setOpen(() => false)
       toast({
         title: `Uhul 🎉 You plant with success!`,
@@ -139,7 +140,7 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
       onOpenChange={(open) => {
         setOpen(open)
         setOpenCreateGarden(false)
-        router.replace("/app")
+        router.replace(pathname)
       }}
     >
       {children}

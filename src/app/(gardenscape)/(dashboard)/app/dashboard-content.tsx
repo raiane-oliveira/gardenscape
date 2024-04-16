@@ -50,9 +50,9 @@ export async function DashboardContent() {
         <Carousel opts={{ dragFree: true }}>
           <CarouselContent className="half-container relative ml-auto px-6">
             {species.map((plant) => (
-              <CarouselItem key={plant.id} className="relative max-w-xs">
+              <CarouselItem key={plant.id} className="group relative max-w-xs">
                 <Link
-                  href={`/plant/${plant.slug}`}
+                  href={`/plants/${plant.slug}`}
                   className="block h-full w-full"
                 >
                   <div className="relative space-y-3">
@@ -60,7 +60,7 @@ export async function DashboardContent() {
                       <Image
                         src={plant.image_url}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover transition-all duration-300 ease-out group-hover:scale-110 group-hover:brightness-75"
                         width={300}
                         height={300}
                       />
@@ -139,9 +139,7 @@ export async function DashboardContent() {
                       <strong className="text-lg font-medium">
                         {garden.name}
                       </strong>
-                      <span className="text-zinc-500">
-                        Author {garden?.author?.name}
-                      </span>
+                      <span className="text-zinc-500">Author</span>
                     </div>
                   </div>
                 </Link>
