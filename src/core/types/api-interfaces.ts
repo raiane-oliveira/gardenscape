@@ -10,6 +10,21 @@ export interface Garden {
   updatedAt?: Date | null
 }
 
+export interface Plant {
+  plantId: string | number
+  gardenId: string
+  plantedAt: Date
+}
+
+export interface GardenDetails extends Garden {
+  gardener: {
+    id: string
+    name: string
+    username: string
+  }
+  plants: Plant[]
+}
+
 export interface Gardener {
   id: string
   name: string
@@ -20,5 +35,5 @@ export interface Gardener {
 }
 
 export interface GardenerDetails extends Gardener {
-  gardens: Garden[]
+  gardens: GardenDetails[]
 }

@@ -11,7 +11,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { CreateFirstGardenForm } from "../components/choose-garden-to-plant-card"
 import { apiTrefle } from "@/utils/api-trefle"
-import { Garden } from "@/core/types/api-interfaces"
+import { GardenDetails } from "@/core/types/api-interfaces"
 import { Specie } from "@/core/types/trefle-api-types"
 import { DialogTrigger } from "@/components/ui/dialog"
 import { get } from "@/utils/get-api"
@@ -24,7 +24,7 @@ export async function DashboardContent() {
     ),
   ])
 
-  const gardens: Garden[] = apiResponse.gardens
+  const gardens: GardenDetails[] = apiResponse.gardens
 
   const species: Specie[] = trefleResponse.data.data
 
@@ -139,7 +139,9 @@ export async function DashboardContent() {
                       <strong className="text-lg font-medium">
                         {garden.name}
                       </strong>
-                      <span className="text-zinc-500">Author</span>
+                      <span className="text-zinc-500">
+                        @{garden.gardener.username}
+                      </span>
                     </div>
                   </div>
                 </Link>
