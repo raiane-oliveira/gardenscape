@@ -59,7 +59,7 @@ export default function PlantsPage() {
         </ToggleGroup>
       </aside>
 
-      <section className="grid grid-cols-4 gap-x-4 gap-y-6">
+      <section className="grid gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
         {isLoading &&
           Array.from({ length: 20 }).map((_, index) => (
             <Skeleton key={index} className="h-[300px]" />

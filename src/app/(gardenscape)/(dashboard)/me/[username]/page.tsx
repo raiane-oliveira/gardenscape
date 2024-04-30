@@ -32,11 +32,10 @@ import dayjs from "dayjs"
 import { cookies } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
-import { PageProps } from "../../../../../../.next/types/app/layout"
 import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
 import { AddNewGardenButton } from "./add-new-garden-button"
 
-interface MePageProps extends PageProps {
+interface MePageProps {
   params: {
     username: string
   }
@@ -46,7 +45,6 @@ export default async function MePage({ params }: MePageProps) {
   const username = params.username
   const { decodedToken } = getToken("server", cookies())
 
-  // FIX: change to use client fetch to solve react query cache error
   const response = await get(`/gardeners/${username}`)
   const data: { gardener: GardenerDetails } = await response.json()
 
@@ -67,12 +65,19 @@ export default async function MePage({ params }: MePageProps) {
     <div>
       <div className="bg-green-300/30">
         <header className="container flex h-80 items-end gap-6 py-8">
-          <button className="group relative grid h-40 w-40 place-content-center overflow-hidden rounded border border-neutral-400 bg-neutral-50 shadow-md before:pointer-events-none before:absolute before:inset-0 before:block before:bg-black/30 before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
-            {/* IMAGE GOES HERE */}
-            <User className="h-12 w-12 text-neutral-700 transition-all duration-300 group-hover:invisible group-hover:h-0 group-hover:opacity-0" />
+          {isOwner ? (
+            <button className="group relative grid h-40 w-40 place-content-center overflow-hidden rounded border border-neutral-400 bg-neutral-50 shadow-md before:pointer-events-none before:absolute before:inset-0 before:block before:bg-black/30 before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
+              {/* IMAGE GOES HERE */}
+              <User className="h-12 w-12 text-neutral-700 transition-all duration-300 group-hover:invisible group-hover:h-0 group-hover:opacity-0" />
 
-            <Camera className="pointer-events-none invisible absolute left-1/2 top-1/2 h-0 w-12 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 group-hover:visible group-hover:h-12 group-hover:opacity-100" />
-          </button>
+              <Camera className="pointer-events-none invisible absolute left-1/2 top-1/2 h-0 w-12 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 group-hover:visible group-hover:h-12 group-hover:opacity-100" />
+            </button>
+          ) : (
+            <div className="grid h-40 w-40 place-content-center overflow-hidden rounded border border-neutral-400 bg-neutral-50 shadow-md">
+              {/* IMAGE GOES HERE */}
+              <User className="h-12 w-12 text-neutral-700" />
+            </div>
+          )}
 
           <div className="space-y-3">
             <h1 className="text-4xl font-semibold">{gardener.name}</h1>
@@ -88,7 +93,7 @@ export default async function MePage({ params }: MePageProps) {
           {isOwner && (
             <Link
               href="/settings/account"
-              className="group ml-auto text-neutral-500 hover:text-neutral-900"
+              className="ml-auto text-neutral-500 hover:text-neutral-900"
             >
               <Gear className="h-7 w-7 transition-colors duration-300" />
             </Link>
