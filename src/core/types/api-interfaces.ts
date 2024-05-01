@@ -30,6 +30,7 @@ export interface Gardener {
   name: string
   email: string
   username: string
+  avatar: string | null
   createdAt: Date
   updatedAt?: Date | null
 }

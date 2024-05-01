@@ -22,18 +22,14 @@ import {
 import { GardenerDetails } from "@/core/types/api-interfaces"
 import { get } from "@/utils/get-api"
 import { getToken } from "@/utils/get-token"
-import {
-  Camera,
-  DotsThreeVertical,
-  Gear,
-  User,
-} from "@phosphor-icons/react/dist/ssr"
+import { DotsThreeVertical, Gear, User } from "@phosphor-icons/react/dist/ssr"
 import dayjs from "dayjs"
 import { cookies } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
 import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
 import { AddNewGardenButton } from "./add-new-garden-button"
+import { AvatarImage } from "../../components/avatar-image"
 
 interface MePageProps {
   params: {
@@ -66,16 +62,21 @@ export default async function MePage({ params }: MePageProps) {
       <div className="bg-green-300/30">
         <header className="container flex h-80 items-end gap-6 py-8">
           {isOwner ? (
-            <button className="group relative grid h-40 w-40 place-content-center overflow-hidden rounded border border-neutral-400 bg-neutral-50 shadow-md before:pointer-events-none before:absolute before:inset-0 before:block before:bg-black/30 before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
-              {/* IMAGE GOES HERE */}
-              <User className="h-12 w-12 text-neutral-700 transition-all duration-300 group-hover:invisible group-hover:h-0 group-hover:opacity-0" />
-
-              <Camera className="pointer-events-none invisible absolute left-1/2 top-1/2 h-0 w-12 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 group-hover:visible group-hover:h-12 group-hover:opacity-100" />
-            </button>
+            <AvatarImage url={gardener.avatar} />
           ) : (
             <div className="grid h-40 w-40 place-content-center overflow-hidden rounded border border-neutral-400 bg-neutral-50 shadow-md">
-              {/* IMAGE GOES HERE */}
-              <User className="h-12 w-12 text-neutral-700" />
+              {gardener.avatar ? (
+                <Image
+                  src={gardener.avatar}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  width={200}
+                  height={200}
+                  quality={100}
+                />
+              ) : (
+                <User className="h-12 w-12 text-neutral-700" />
+              )}
             </div>
           )}
 

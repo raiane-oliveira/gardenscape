@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "bs.plantnet.org",
       },
+      {
+        protocol: "https",
+        hostname: "pub-2226e8028e4941c7a347c50887830dcb.r2.dev",
+      },
     ],
   },
 }
