@@ -32,7 +32,16 @@ export function Header() {
         <Logo />
       </Link>
 
-      {!decodedToken ? null : (
+      {!decodedToken ? (
+        <nav className="flex items-center gap-4">
+          <Button variant="ghost" size="lg" asChild className="text-lg">
+            <Link href="/sign-up">Sign Up</Link>
+          </Button>
+          <Button asChild size="lg" className="text-lg">
+            <Link href="/login">Login</Link>
+          </Button>
+        </nav>
+      ) : (
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-900 p-2">
             <Avatar>
