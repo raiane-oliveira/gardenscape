@@ -9,7 +9,7 @@ import {
 import { CaretRight, Plus } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import Image from "next/image"
-import { CreateFirstGardenForm } from "../components/choose-garden-to-plant-card"
+import { ChooseGardenToPlantForm } from "../components/choose-garden-to-plant-card"
 import { apiTrefle } from "@/utils/api-trefle"
 import { GardenDetails } from "@/core/types/api-interfaces"
 import { Specie } from "@/core/types/trefle-api-types"
@@ -77,19 +77,18 @@ export async function DashboardContent() {
                   </div>
                 </Link>
 
-                <CreateFirstGardenForm>
+                <ChooseGardenToPlantForm
+                  plant={{ id: plant.id, imageUrl: plant.image_url }}
+                >
                   <DialogTrigger asChild>
                     <Button
                       className="absolute bottom-12 right-6 z-10 h-12 w-12 rounded-full bg-green-500 shadow-md"
-                      asChild
                       size="icon"
                     >
-                      <Link href={`/app?plantId=${plant.id}`} replace shallow>
-                        <Plus className="h-5 w-5" />
-                      </Link>
+                      <Plus className="h-5 w-5" />
                     </Button>
                   </DialogTrigger>
-                </CreateFirstGardenForm>
+                </ChooseGardenToPlantForm>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -118,35 +117,40 @@ export async function DashboardContent() {
 
         <Carousel opts={{ dragFree: true }}>
           <CarouselContent className="half-container relative ml-auto px-6">
-            {gardens.map((garden) => (
-              <CarouselItem key={garden.id} className="relative max-w-xs">
-                <Link
-                  href={`/garden/${garden.slug}`}
-                  className="block h-full w-full"
-                >
-                  <div className="relative space-y-3">
-                    <div className="h-56 w-full overflow-hidden rounded-lg">
-                      <Image
-                        src={""}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        width={300}
-                        height={300}
-                      />
-                    </div>
+            {gardens.map((garden) => {
+              const firstPlantImageUrl =
+                garden.plants.length > 0 ? garden.plants[0].plantUrl : ""
 
-                    <div className="flex flex-col gap-1">
-                      <strong className="text-lg font-medium">
-                        {garden.name}
-                      </strong>
-                      <span className="text-zinc-500">
-                        @{garden.gardener.username}
-                      </span>
+              return (
+                <CarouselItem key={garden.id} className="relative max-w-xs">
+                  <Link
+                    href={`/garden/${garden.slug}`}
+                    className="block h-full w-full"
+                  >
+                    <div className="relative space-y-3">
+                      <div className="h-56 w-full overflow-hidden rounded-lg">
+                        <Image
+                          src={firstPlantImageUrl ?? ""}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          width={300}
+                          height={300}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <strong className="text-lg font-medium">
+                          {garden.name}
+                        </strong>
+                        <span className="text-zinc-500">
+                          @{garden.gardener.username}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </CarouselItem>
-            ))}
+                  </Link>
+                </CarouselItem>
+              )
+            })}
           </CarouselContent>
 
           <CarouselPrevious className="left-6 disabled:hidden" />

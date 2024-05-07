@@ -6,7 +6,7 @@ import { Specie } from "@/core/types/trefle-api-types"
 import { Plus } from "@phosphor-icons/react/dist/ssr"
 import Image from "next/image"
 import Link from "next/link"
-import { CreateFirstGardenForm } from "../components/choose-garden-to-plant-card"
+import { ChooseGardenToPlantForm } from "../components/choose-garden-to-plant-card"
 import { DialogTrigger } from "@/components/ui/dialog"
 import { SearchPlantsForm } from "../components/search-plants-form"
 import { useQuery } from "@tanstack/react-query"
@@ -92,19 +92,18 @@ export default function PlantsPage() {
                 </div>
               </Link>
 
-              <CreateFirstGardenForm>
+              <ChooseGardenToPlantForm
+                plant={{ id: plant.id, imageUrl: plant.image_url }}
+              >
                 <DialogTrigger asChild>
                   <Button
                     className="absolute bottom-12 right-6 z-10 h-12 w-12 rounded-full bg-green-500 shadow-md"
-                    asChild
                     size="icon"
                   >
-                    <Link href={`/plants?plantId=${plant.id}`} replace shallow>
-                      <Plus className="h-5 w-5" />
-                    </Link>
+                    <Plus className="h-5 w-5" />
                   </Button>
                 </DialogTrigger>
-              </CreateFirstGardenForm>
+              </ChooseGardenToPlantForm>
             </div>
           )
         })}

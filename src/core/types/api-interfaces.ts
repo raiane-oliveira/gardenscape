@@ -12,6 +12,7 @@ export interface Garden {
 
 export interface Plant {
   plantId: string | number
+  plantUrl: string | null
   gardenId: string
   plantedAt: Date
 }

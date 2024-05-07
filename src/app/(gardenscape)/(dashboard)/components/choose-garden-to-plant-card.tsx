@@ -12,7 +12,6 @@ import { CreateGardenCardForm } from "@/components/app/create-garden-card-form"
 import { useState } from "react"
 import { ChildrenProps } from "@/core/types/children-props"
 import { toast } from "@/components/ui/use-toast"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { AxiosError } from "axios"
 import { axios } from "@/lib/axios"
 import { getCookie } from "cookies-next"
@@ -29,7 +28,12 @@ import { z } from "zod"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { Garden } from "@/core/types/api-interfaces"
 
-interface CreateGardenFormProps extends ChildrenProps {}
+interface CreateGardenFormProps extends ChildrenProps {
+  plant: {
+    id: number
+    imageUrl?: string | null
+  }
+}
 
 const chooseGardenToPlantSchema = z.object({
   gardens: z.array(
@@ -41,7 +45,10 @@ const chooseGardenToPlantSchema = z.object({
 
 type ChooseGardenToPlantFormData = z.infer<typeof chooseGardenToPlantSchema>
 
-export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
+export function ChooseGardenToPlantForm({
+  children,
+  plant,
+}: CreateGardenFormProps) {
   const [open, setOpen] = useState(false)
   const [openCreateGarden, setOpenCreateGarden] = useState(false)
 
@@ -58,12 +65,6 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
     control,
     name: "gardens",
   })
-
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const router = useRouter()
-
-  const plantId = searchParams.get("plantId")
 
   const token = getCookie(accessTokenCookieName)
   const decodedToken: Token = jwtDecode(token ?? "")
@@ -93,7 +94,8 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
         return axios.post(
           `/gardens/${garden.gardenId}/plant`,
           {
-            plantId,
+            plantId: plant.id,
+            plantUrl: plant.imageUrl,
           },
           {
             headers: {
@@ -105,7 +107,6 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
 
       await Promise.all(plantOnGardens)
 
-      router.replace(pathname)
       setOpen(() => false)
       toast({
         title: `Uhul 🎉 You plant with success!`,
@@ -140,7 +141,6 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
       onOpenChange={(open) => {
         setOpen(open)
         setOpenCreateGarden(false)
-        router.replace(pathname)
       }}
     >
       {children}
@@ -158,43 +158,45 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
                 </DialogDescription>
               </DialogHeader>
 
-              <form
-                id="plant-on-garden-form"
-                onSubmit={handleSubmit(handlePlantOnGarden)}
-                className="custom-scrollbar max-h-80 min-h-32 space-y-2 overflow-auto"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
-                    <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
-                    <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
-                  </>
-                ) : (
-                  gardens.map((garden) => {
-                    return (
-                      <label
-                        key={garden.id}
-                        className="flex flex-row items-center justify-between rounded-lg border p-4"
-                      >
-                        <div className="space-y-0.5">
-                          <span className="text-base">{garden.name}</span>
-                        </div>
+              {gardens.length > 0 && (
+                <form
+                  id="plant-on-garden-form"
+                  onSubmit={handleSubmit(handlePlantOnGarden)}
+                  className="custom-scrollbar max-h-80 min-h-32 space-y-2 overflow-auto"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
+                      <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
+                      <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-200" />
+                    </>
+                  ) : (
+                    gardens.map((garden) => {
+                      return (
+                        <label
+                          key={garden.id}
+                          className="flex flex-row items-center justify-between rounded-lg border p-4"
+                        >
+                          <div className="space-y-0.5">
+                            <span className="text-base">{garden.name}</span>
+                          </div>
 
-                        <Checkbox
-                          onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === "boolean") {
-                              toggleAddGardenToForm(checked, garden.id)
-                            }
-                          }}
-                        />
-                      </label>
-                    )
-                  })
-                )}
-              </form>
+                          <Checkbox
+                            onCheckedChange={(checked: CheckedState) => {
+                              if (typeof checked === "boolean") {
+                                toggleAddGardenToForm(checked, garden.id)
+                              }
+                            }}
+                          />
+                        </label>
+                      )
+                    })
+                  )}
+                </form>
+              )}
 
               {gardens.length === 0 ? (
-                <p className="text-center text-sm text-neutral-500">
+                <p className="py-6 text-center text-sm text-neutral-500">
                   It seems you don&apos;t have any garden yet.
                 </p>
               ) : (
@@ -211,7 +213,10 @@ export function CreateFirstGardenForm({ children }: CreateGardenFormProps) {
               )}
             </div>
 
-            <Button variant="ghost" onClick={toggleOpenCreateGarden}>
+            <Button
+              variant={gardens.length > 0 ? "ghost" : "default"}
+              onClick={toggleOpenCreateGarden}
+            >
               Add new garden
             </Button>
           </>
