@@ -17,7 +17,6 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { GardenerDetails } from "@/core/types/api-interfaces"
 import { get } from "@/utils/get-api"
 import { getToken } from "@/utils/get-token"
 import { DotsThreeVertical, Gear, User } from "@phosphor-icons/react/dist/ssr"
@@ -28,6 +27,7 @@ import Link from "next/link"
 import { GardenSettingsDropdownContent } from "../../components/garden-settings-dropdown-content"
 import { AddNewGardenButton } from "./add-new-garden-button"
 import { AvatarImage } from "../../components/avatar-image"
+import { GardenDetails, Gardener } from "@/core/types/api-interfaces"
 
 interface MePageProps {
   params: {
@@ -37,25 +37,32 @@ interface MePageProps {
 
 export default async function MePage({ params }: MePageProps) {
   const username = params.username
-  const { decodedToken } = getToken("server", cookies())
+  const { decodedToken, token } = getToken("server", cookies())
 
-  const response = await get(`/gardeners/${username}`, {
-    next: {
-      tags: ["gardeners", username],
-    },
-  })
-  const data: { gardener: GardenerDetails } = await response.json()
+  const [responseGardener, responseGardens] = await Promise.all([
+    get(`/gardeners/${username}`, {
+      next: {
+        tags: ["gardeners", username],
+      },
+    }).then((res) => res.json()),
+    get(`/user/gardens`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.json()),
+  ])
 
-  if (!data) {
+  if (!responseGardener || !responseGardens) {
     return <h1 className="animate-pulse text-4xl">Loading...</h1>
   }
 
-  const { gardener } = data
-  const isOwner = decodedToken && username === decodedToken.username
+  const { gardener }: { gardener: Gardener } = responseGardener
+  const { gardens }: { gardens: GardenDetails[] } = responseGardens
 
+  const isOwner = decodedToken && username === decodedToken.username
   const memberSince = dayjs(gardener.createdAt).format("[Member since ]LL")
 
-  const amountPlants = gardener.gardens.reduce((previous, current) => {
+  const amountPlants = gardens.reduce((previous, current) => {
     return previous + current.plants.length
   }, 0)
 
@@ -124,7 +131,7 @@ export default async function MePage({ params }: MePageProps) {
           </CardHeader>
 
           <CardContent className="text-2xl font-semibold text-neutral-800">
-            {gardener.gardens.length}
+            {gardens.length}
           </CardContent>
         </Card>
         <Card className="w-full flex-1 shadow-md">
@@ -150,7 +157,7 @@ export default async function MePage({ params }: MePageProps) {
             {isOwner && <AddNewGardenButton />}
           </header>
 
-          {gardener.gardens.length === 0 ? (
+          {gardens.length === 0 ? (
             <p className="half-container py-6 text-neutral-700">
               {isOwner
                 ? "It seems you don't have any garden yet."
@@ -159,7 +166,7 @@ export default async function MePage({ params }: MePageProps) {
           ) : (
             <Carousel opts={{ dragFree: true }}>
               <CarouselContent className="half-container relative ml-auto px-6">
-                {gardener.gardens.map((garden) => {
+                {gardens.map((garden) => {
                   if (!isOwner && garden.visibility === "private") {
                     return null
                   }
