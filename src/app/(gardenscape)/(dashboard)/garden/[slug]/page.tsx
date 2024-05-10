@@ -1,4 +1,4 @@
-import { get } from "@/utils/get-api"
+import { get } from "@/shared/api"
 
 interface GardenPageProps {
   params: {

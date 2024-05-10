@@ -1,8 +1,8 @@
-import { accessTokenCookieName } from "@/data/static-info"
+import { accessTokenCookieName } from "@/shared/model"
 import { jwtDecode } from "jwt-decode"
 import { NextRequest, NextResponse } from "next/server"
-import { checkTimestampBeforeToday } from "./utils/check-timestamp-before-today"
-import { Token } from "@/core/types/token"
+import { checkTimestampBeforeToday } from "@/shared/lib"
+import { Token } from "@/shared/api"
 
 // routes where only unauthenticated user can access
 const unauthorizedRoutesWhenAuthenticate = ["/login", "/sign-up", "/"]

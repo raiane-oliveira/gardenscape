@@ -1,10 +1,10 @@
-import "@/lib/dayjs"
+import "@/shared/config/dayjs"
+import "./styles/globals.css"
 
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "@/styles/globals.css"
-import { cn } from "@/lib/utils"
-import { Toaster } from "@/components/ui/toaster"
+import { cn } from "@/shared/lib"
+import { Toaster } from "@/shared/ui"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 

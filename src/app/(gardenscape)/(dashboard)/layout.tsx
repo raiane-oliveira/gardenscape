@@ -1,10 +1,10 @@
 "use client"
 
-import { ChildrenProps } from "@/core/types/children-props"
-import { Header } from "./components/header"
+import { ChildrenProps } from "@/shared/lib"
+import { Header } from "@/widgets/dashboard"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import { queryClient } from "@/lib/react-query"
+import { queryClient } from "@/shared/config"
 
 export default function AppLayout({ children }: ChildrenProps) {
   return (
