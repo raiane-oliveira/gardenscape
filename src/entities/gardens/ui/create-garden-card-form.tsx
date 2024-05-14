@@ -18,28 +18,24 @@ import {
   toast,
 } from "@/shared/ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useCreateGarden } from "@/entities/gardens"
-
-const createGardenFormSchema = z.object({
-  name: z.string(),
-  private: z.boolean().default(false),
-})
-
-type CreateGardenFormData = z.infer<typeof createGardenFormSchema>
+import {
+  useCreateGarden,
+  CreateGardenData,
+  createGardenSchema,
+} from "@/entities/gardens"
 
 interface CreateGardenCardContentProps {
   actionAfterSubmitted?: () => void
 }
 
 export function CreateGardenCardForm(props: CreateGardenCardContentProps) {
-  const form = useForm<CreateGardenFormData>({
-    resolver: zodResolver(createGardenFormSchema),
+  const form = useForm<CreateGardenData>({
+    resolver: zodResolver(createGardenSchema),
   })
 
   const { mutateAsync: createGardenFn } = useCreateGarden()
 
-  async function onSubmit(data: CreateGardenFormData) {
+  async function onSubmit(data: CreateGardenData) {
     const result = await createGardenFn({
       name: data.name,
       private: data.private,

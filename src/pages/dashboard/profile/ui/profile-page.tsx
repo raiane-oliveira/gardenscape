@@ -1,27 +1,18 @@
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/shared/ui"
-import { get, getToken, GardenDetails, Gardener } from "@/shared/api"
-import { DotsThreeVertical, Gear, User } from "@phosphor-icons/react/dist/ssr"
+"use client"
+
+import { Card, CardContent, CardDescription, CardHeader } from "@/shared/ui"
+import { getToken } from "@/shared/api"
+import { Gear, User } from "@phosphor-icons/react/dist/ssr"
 import dayjs from "dayjs"
-import { cookies } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
-import { GardenSettingsDropdownContent } from "./garden-settings-dropdown-content"
 import { AddNewGardenButton } from "./add-new-garden-button"
 import { AvatarImage } from "./avatar-image"
+import { useCurrentUser } from "@/entities/user"
+import { useUserGardens } from "@/entities/gardens"
+import { ErrorPage } from "@/pages/error"
+import { GardensCarousel } from "./gardens-carousel"
+import { ProfileSkeletonPage } from "@/pages/skeletons"
 
 export interface ProfilePageProps {
   params: {
@@ -29,29 +20,29 @@ export interface ProfilePageProps {
   }
 }
 
-export async function ProfilePage({ params }: ProfilePageProps) {
+export function ProfilePage({ params }: ProfilePageProps) {
   const username = params.username
-  const { decodedToken, token } = getToken("server", cookies())
+  const { decodedToken } = getToken()
 
-  const [responseGardener, responseGardens] = await Promise.all([
-    get(`/gardeners/${username}`, {
-      next: {
-        tags: ["gardeners", username],
-      },
-    }).then((res) => res.json()),
-    get(`/user/gardens`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.json()),
-  ])
+  const { query: gardenerQuery } = useCurrentUser()
 
-  if (!responseGardener || !responseGardens) {
-    return <h1 className="animate-pulse text-4xl">Loading...</h1>
+  const queryGardens = useUserGardens()
+
+  if (gardenerQuery.isLoading || queryGardens.isLoading) {
+    return <ProfileSkeletonPage />
   }
 
-  const { gardener }: { gardener: Gardener } = responseGardener
-  const { gardens }: { gardens: GardenDetails[] } = responseGardens
+  const gardener = gardenerQuery.data?.isRight()
+    ? gardenerQuery.data?.value.gardener
+    : null
+
+  const gardens = gardenerQuery.data?.isRight()
+    ? queryGardens.data?.gardens
+    : null
+
+  if (!gardener || !gardens) {
+    return <ErrorPage />
+  }
 
   const isOwner = decodedToken && username === decodedToken.username
   const memberSince = dayjs(gardener.createdAt).format("[Member since ]LL")
@@ -151,98 +142,7 @@ export async function ProfilePage({ params }: ProfilePageProps) {
             {isOwner && <AddNewGardenButton />}
           </header>
 
-          {gardens.length === 0 ? (
-            <p className="half-container py-6 text-neutral-700">
-              {isOwner
-                ? "It seems you don't have any garden yet."
-                : `It seems ${username} does not have any garden yet.`}
-            </p>
-          ) : (
-            <Carousel opts={{ dragFree: true }}>
-              <CarouselContent className="half-container relative ml-auto px-6">
-                {gardens.map((garden) => {
-                  if (!isOwner && garden.visibility === "private") {
-                    return null
-                  }
-
-                  console.log(garden)
-
-                  const firstPlantImageUrl =
-                    garden.plants.length > 0 ? garden.plants[0].plantUrl : ""
-
-                  const updatedAt = dayjs(garden.updatedAt).format("LL")
-                  const createdAt = dayjs(garden.createdAt).format("LL")
-
-                  return (
-                    <CarouselItem key={garden.id} className="relative max-w-xs">
-                      {isOwner && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              className="absolute right-2 top-2 z-10"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <DotsThreeVertical className="h-6 w-6" />
-                            </Button>
-                          </DropdownMenuTrigger>
-
-                          <GardenSettingsDropdownContent garden={garden} />
-                        </DropdownMenu>
-                      )}
-
-                      <Link
-                        href={`/garden/${garden.slug}`}
-                        className="block h-full w-full"
-                      >
-                        <div className="relative space-y-3">
-                          <div className="h-56 w-full overflow-hidden rounded-lg">
-                            <Image
-                              src={firstPlantImageUrl ?? ""}
-                              alt=""
-                              className="h-full w-full object-cover"
-                              width={300}
-                              height={300}
-                            />
-                          </div>
-
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2">
-                              <strong className="text-lg font-medium">
-                                {garden.name}
-                              </strong>
-
-                              {isOwner && (
-                                <Badge
-                                  variant={
-                                    garden.visibility === "private"
-                                      ? "secondary"
-                                      : "default"
-                                  }
-                                  className="ml-auto uppercase"
-                                >
-                                  {garden.visibility}
-                                </Badge>
-                              )}
-                            </div>
-
-                            <span className="text-zinc-500">
-                              {garden.updatedAt
-                                ? `Updated at ${updatedAt}`
-                                : `Created at ${createdAt}`}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    </CarouselItem>
-                  )
-                })}
-              </CarouselContent>
-
-              <CarouselPrevious className="left-6 disabled:hidden" />
-              <CarouselNext className="right-6 z-20" />
-            </Carousel>
-          )}
+          <GardensCarousel isOwner={isOwner} gardens={gardens} />
         </section>
       </main>
     </div>

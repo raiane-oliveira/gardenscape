@@ -18,14 +18,18 @@ import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { redirect } from "next/navigation"
 import { getToken } from "@/shared/api"
 import { logout } from "@/features/auth"
+import { useCurrentUser } from "@/entities/user"
 
 export function Header() {
   const { decodedToken } = getToken()
+  const { query } = useCurrentUser()
 
   function handleLogout() {
     logout()
     redirect("/")
   }
+
+  const gardener = query.data?.isRight() ? query.data?.value.gardener : null
 
   return (
     <header className="container flex items-center justify-between py-8">
@@ -46,7 +50,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-900 p-2">
             <Avatar>
-              <AvatarImage />
+              <AvatarImage src={gardener?.avatar ?? ""} />
               <AvatarFallback className="flex flex-1 items-center justify-center self-center">
                 <User className="h-6 w-6" />
               </AvatarFallback>

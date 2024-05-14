@@ -10,11 +10,12 @@ export const createGardenSchema = z.object({
   private: z.boolean().default(false),
 })
 
+export type CreateGardenData = z.infer<typeof createGardenSchema>
+
 interface CreateGardenApiResponse {
   garden: Garden
 }
 
-type CreateGardenData = z.infer<typeof createGardenSchema>
 type CreateGardenResponse = Either<
   Error | UnexpectedError,
   CreateGardenApiResponse
