@@ -61,6 +61,7 @@ export function HomePage() {
               alt=""
               width={792}
               height={344}
+              priority
             />
             <div
               aria-hidden

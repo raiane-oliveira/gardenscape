@@ -15,10 +15,20 @@ import { apiTrefle, get, GardenDetails, Specie } from "@/shared/api"
 
 export async function DashboardContent() {
   const [apiResponse, trefleResponse] = await Promise.all([
-    get(`/gardens`).then((res) => res.json()),
+    get(`/gardens`)
+      .then((res) => res.json())
+      .catch((err) => console.log(err)),
     apiTrefle(
       "/species?filter_not[common_name]=null&filter_not[image_url]=null",
-    ),
+    ).catch((err) => {
+      console.log(err)
+
+      return {
+        data: {
+          data: [],
+        },
+      }
+    }),
   ])
 
   const gardens: GardenDetails[] = apiResponse.gardens
