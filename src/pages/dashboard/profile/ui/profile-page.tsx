@@ -132,7 +132,7 @@ export function ProfilePage({ params }: ProfilePageProps) {
         </Card>
       </aside>
 
-      <main className="py-8">
+      <main className="space-y-8 py-8">
         <section className="grid gap-6">
           <header className="container flex items-center justify-between gap-4">
             <h2 className="text-3xl font-semibold text-zinc-700">

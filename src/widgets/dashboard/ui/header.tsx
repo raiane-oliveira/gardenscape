@@ -19,6 +19,7 @@ import { redirect } from "next/navigation"
 import { getToken } from "@/shared/api"
 import { logout } from "@/features/auth"
 import { useCurrentUser } from "@/entities/user"
+import Image from "next/image"
 
 export function Header() {
   const { decodedToken } = getToken()
@@ -50,7 +51,16 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-900 p-2">
             <Avatar>
-              <AvatarImage src={gardener?.avatar ?? ""} />
+              <AvatarImage src={gardener?.avatar ?? ""} asChild>
+                <Image
+                  src={gardener?.avatar ?? ""}
+                  alt={gardener?.name ?? ""}
+                  className="h-full w-full object-cover"
+                  width={70}
+                  height={70}
+                  quality={100}
+                />
+              </AvatarImage>
               <AvatarFallback className="flex flex-1 items-center justify-center self-center">
                 <User className="h-6 w-6" />
               </AvatarFallback>

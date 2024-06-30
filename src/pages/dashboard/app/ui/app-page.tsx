@@ -4,8 +4,9 @@ import { DashboardContent } from "./dashboard-content"
 import { Suspense } from "react"
 import { LoadingDashboardContent } from "./loading-dashboard-content"
 import { SearchPlantsForm } from "@/features/search-plants"
+import { BillingPlansGrid } from "@/widgets/dashboard"
 
-export function AppPage() {
+export async function AppPage() {
   return (
     <main className="space-y-12 pb-8">
       <header className="container space-y-6">
@@ -38,6 +39,22 @@ export function AppPage() {
       <Suspense fallback={<LoadingDashboardContent />}>
         <DashboardContent />
       </Suspense>
+
+      <section className="container mx-auto grid w-full gap-6">
+        <header className="container flex flex-col items-center gap-4">
+          <h2 className="text-3xl font-semibold text-zinc-700">
+            Unlock new powers subscribing in our plans!
+          </h2>
+
+          <p className="mx-auto max-w-md text-center font-medium text-zinc-400">
+            Subscribe in our plans and unlock new features like{" "}
+            <strong>schedule timers to water your gardens</strong>, and much
+            more!
+          </p>
+        </header>
+
+        <BillingPlansGrid />
+      </section>
     </main>
   )
 }

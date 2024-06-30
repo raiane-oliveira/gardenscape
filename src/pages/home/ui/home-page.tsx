@@ -11,6 +11,7 @@ import Image from "next/image"
 import peoplePlantingIllustration from "@/assets/people-planting.png"
 import plant from "@/assets/plant.png"
 import { Logo } from "@/shared/ui"
+import { BillingPlansGrid } from "@/widgets/dashboard"
 
 export function HomePage() {
   return (
@@ -176,6 +177,26 @@ export function HomePage() {
               </span>
             </div>
           </div>
+        </section>
+
+        <section className="container mx-auto grid w-full gap-6">
+          <header className="container flex flex-col items-center gap-4">
+            <h2 className="text-3xl font-semibold text-zinc-700">
+              Unlock new powers subscribing in our plans!
+            </h2>
+
+            <p className="mx-auto max-w-md text-center font-medium text-zinc-400">
+              Subscribe in our plans and unlock new features like{" "}
+              <strong>schedule timers to water your gardens</strong>, and much
+              more!
+            </p>
+          </header>
+
+          <BillingPlansGrid
+            asLink={{
+              href: "/sign-up",
+            }}
+          />
         </section>
       </main>
     </div>

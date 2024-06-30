@@ -42,3 +42,25 @@ export interface Gardener {
   createdAt: Date
   updatedAt?: Date | null
 }
+
+export interface Product {
+  id: string
+  name: string
+  description: string
+  imageUrl?: string | null
+  price: number
+  status?: string
+  createdAt: Date
+}
+
+export interface Feature {
+  id: string
+  name: string
+  description?: string | null
+  createdAt: Date
+  updatedAt?: Date | null
+}
+
+export interface ProductWithFeatures extends Product {
+  features: Feature[]
+}
