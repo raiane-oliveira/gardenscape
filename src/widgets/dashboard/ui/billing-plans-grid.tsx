@@ -1,6 +1,7 @@
 "use client"
 
 import { useFetchProducts } from "@/features/fetch-products"
+import { axios, getToken } from "@/shared/api"
 import { Button, Skeleton } from "@/shared/ui"
 import Link from "next/link"
 
@@ -18,6 +19,7 @@ interface BillingPlansGridProps {
 
 export function BillingPlansGrid({ asLink }: BillingPlansGridProps) {
   const { data, isLoading } = useFetchProducts()
+  const { token } = getToken()
 
   const subscriptions = data?.products.sort((a, b) => {
     const firstStatus = a.status ?? ""
@@ -39,6 +41,20 @@ export function BillingPlansGrid({ asLink }: BillingPlansGridProps) {
     )
   }
 
+  async function handleStartPayment(productId: string) {
+    const response = await axios.post(
+      `/products/${productId}/checkout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+
+    window.location.href = response.data.checkoutUrl
+  }
+
   return (
     <div className="mx-auto mt-6 flex gap-6">
       {subscriptions?.map((product) => {
@@ -46,7 +62,7 @@ export function BillingPlansGrid({ asLink }: BillingPlansGridProps) {
           <div
             key={product.id}
             data-status={product.status}
-            className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white px-6 py-8 data-[status=recommended]:scale-110"
+            className="flex max-w-80 flex-col gap-4 rounded-lg border border-neutral-200 bg-white px-6 py-8 data-[status=recommended]:scale-110"
           >
             <header className="space-y-3">
               <h3 className="text-xl font-semibold">{product.name}</h3>
@@ -64,7 +80,14 @@ export function BillingPlansGrid({ asLink }: BillingPlansGridProps) {
                   <Link href={asLink.href}>Get started</Link>
                 </Button>
               ) : (
-                <Button className="w-full uppercase">Get started</Button>
+                <Button
+                  className="w-full uppercase"
+                  onClick={() => {
+                    handleStartPayment(product.id)
+                  }}
+                >
+                  Get started
+                </Button>
               )}
               {/* <Button className="w-full uppercase" asChild variant="outline"> */}
               {/*   <div>Current plan</div> */}

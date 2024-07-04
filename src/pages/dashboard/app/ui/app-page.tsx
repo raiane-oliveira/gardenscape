@@ -6,7 +6,8 @@ import { LoadingDashboardContent } from "./loading-dashboard-content"
 import { SearchPlantsForm } from "@/features/search-plants"
 import { BillingPlansGrid } from "@/widgets/dashboard"
 
-export async function AppPage() {
+export async function AppPage({ searchParams }: { searchParams: string }) {
+  console.log("search params", searchParams)
   return (
     <main className="space-y-12 pb-8">
       <header className="container space-y-6">
