@@ -64,3 +64,22 @@ export interface Feature {
 export interface ProductWithFeatures extends Product {
   features: Feature[]
 }
+
+export interface SubscriptionWithDetails {
+  id: string
+  userId: string
+  active: boolean
+  subscribeAt: Date
+  product: {
+    id: string
+    name: string
+    description: string
+    imageUrl?: string | null
+    price: number
+    features: {
+      id: string
+      name: string
+      description?: string | null
+    }[]
+  }
+}
